@@ -71,15 +71,7 @@ class Signaling {
 
   Map<String, dynamic> _iceServers = {
     'iceServers': [
-      {'url': 'stun:stun.l.google.com:19302'},
-      /*
-       * turn server configuration example.
-      {
-        'url': 'turn:123.45.67.89:3478',
-        'username': 'change_to_real_user',
-        'credential': 'change_to_real_secret'
-      },
-      */
+      {'url': 'stun:192.168.1.112:3478'},
     ]
   };
 
@@ -288,27 +280,27 @@ class Signaling {
 
     print('connect to $url');
 
-    if (_turnCredential == null) {
-      try {
-        _turnCredential = await getTurnCredential(_host, _port);
-        /*{
-            "username": "1584195784:mbzrxpgjys",
-            "password": "isyl6FF6nqMTB9/ig5MrMRUXqZg",
-            "ttl": 86400,
-            "uris": ["turn:127.0.0.1:19302?transport=udp"]
-          }
-        */
-        _iceServers = {
-          'iceServers': [
-            {
-              'urls': _turnCredential['uris'][0],
-              'username': _turnCredential['username'],
-              'credential': _turnCredential['password']
-            },
-          ]
-        };
-      } catch (e) {}
-    }
+    // if (_turnCredential == null) {
+    //   try {
+    //     _turnCredential = await getTurnCredential(_host, _port);
+    //     /*{
+    //         "username": "1584195784:mbzrxpgjys",
+    //         "password": "isyl6FF6nqMTB9/ig5MrMRUXqZg",
+    //         "ttl": 86400,
+    //         "uris": ["turn:127.0.0.1:19302?transport=udp"]
+    //       }
+    //     */
+    //     _iceServers = {
+    //       'iceServers': [
+    //         {
+    //           'urls': _turnCredential['uris'][0],
+    //           'username': _turnCredential['username'],
+    //           'credential': _turnCredential['password']
+    //         },
+    //       ]
+    //     };
+    //   } catch (e) {}
+    // }
 
     _socket?.onOpen = () {
       print('onOpen');

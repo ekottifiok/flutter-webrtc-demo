@@ -1,6 +1,8 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc_demo/src/serveless/callee.dart';
+import 'package:flutter_webrtc_demo/src/serveless/caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'src/call_sample/call_sample.dart';
@@ -19,12 +21,19 @@ enum DialogDemoAction {
   connect,
 }
 
+enum Page {
+  callSample,
+  dataChannel,
+  servelessCallee,
+  servelessCaller,
+}
+
 class _MyAppState extends State<MyApp> {
   List<RouteItem> items = [];
   String _server = '';
   late SharedPreferences _prefs;
+  Page? page;
 
-  bool _datachannel = false;
   @override
   initState() {
     super.initState();
@@ -77,12 +86,20 @@ class _MyAppState extends State<MyApp> {
       if (value != null) {
         if (value == DialogDemoAction.connect) {
           _prefs.setString('server', _server);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => _datachannel
-                      ? DataChannelSample(host: _server)
-                      : CallSample(host: _server)));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (BuildContext context) {
+            switch (page) {
+              case Page.dataChannel:
+                return DataChannelSample(host: _server);
+              case Page.callSample:
+                return CallSample(host: _server);
+              case Page.servelessCaller:
+                return Caller(host: _server);
+              case Page.servelessCallee:
+              default:
+                return Callee(host: _server);
+            }
+          }));
         }
       }
     });
@@ -106,12 +123,12 @@ class _MyAppState extends State<MyApp> {
             ),
             actions: <Widget>[
               TextButton(
-                  child: const Text('CANCEL'),
+                  child: const Text('Cancel'),
                   onPressed: () {
                     Navigator.pop(context, DialogDemoAction.cancel);
                   }),
               TextButton(
-                  child: const Text('CONNECT'),
+                  child: const Text('Connect'),
                   onPressed: () {
                     Navigator.pop(context, DialogDemoAction.connect);
                   })
@@ -124,16 +141,32 @@ class _MyAppState extends State<MyApp> {
           title: 'P2P Call Sample',
           subtitle: 'P2P Call Sample.',
           push: (BuildContext context) {
-            _datachannel = false;
+            page = Page.callSample;
             _showAddressDialog(context);
           }),
       RouteItem(
           title: 'Data Channel Sample',
           subtitle: 'P2P Data Channel.',
           push: (BuildContext context) {
-            _datachannel = true;
+            page = Page.dataChannel;
             _showAddressDialog(context);
           }),
+      RouteItem(
+        title: 'P2P Caller',
+        subtitle: 'P2P Caller Serveless',
+        push: (BuildContext context) {
+          page = Page.servelessCaller;
+          _showAddressDialog(context);
+        },
+      ),
+      RouteItem(
+        title: 'P2P Callee',
+        subtitle: 'P2P Callee Serveless',
+        push: (BuildContext context) {
+          page = Page.servelessCallee;
+          _showAddressDialog(context);
+        },
+      ),
     ];
   }
 }
